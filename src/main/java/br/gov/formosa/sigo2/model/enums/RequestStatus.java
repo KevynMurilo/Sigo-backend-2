@@ -1,0 +1,14 @@
+package br.gov.formosa.sigo2.model.enums;
+
+public enum RequestStatus {
+    NOVA,
+    EM_VISTORIA,
+    EM_VISTORIA_FISCAL_E_SANITARIA,
+    AGUARDANDO_CORRECAO,
+    AGUARDANDO_EMISSAO_BOLETO,
+    AGUARDANDO_PAGAMENTO,
+    AGUARDANDO_ACEITE_RENOVACAO,
+    ATIVO,
+    RECUSADO,
+    INATIVO
+}
