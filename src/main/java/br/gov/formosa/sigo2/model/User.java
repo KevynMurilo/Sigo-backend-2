@@ -2,8 +2,12 @@ package br.gov.formosa.sigo2.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 @Entity
@@ -13,8 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"name"})
-public class User implements Serializable {
+@ToString(exclude = {"role"})
+public class User implements Serializable, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,7 +36,7 @@ public class User implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "papel_id")
-    private Role name;
+    private Role role;
 
     @Column(name = "doc_identidade_frente_url")
     private String identityDocumentFrontUrl;
@@ -45,4 +49,42 @@ public class User implements Serializable {
 
     @Column(name = "onboarding_concluido", nullable = false)
     private boolean onboardingCompleted = false;
+
+    @Column(name = "ativo")
+    private boolean enabled = true;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(() -> "ROLE_" + getRole().getName());
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isEnabled();
+    }
 }
