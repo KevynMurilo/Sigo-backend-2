@@ -6,6 +6,8 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "papel")
 @Getter
@@ -14,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Role implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include

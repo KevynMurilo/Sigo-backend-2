@@ -1,5 +1,6 @@
 package br.gov.formosa.sigo2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +37,7 @@ public class User implements Serializable, UserDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "papel_id")
+    @JsonIgnore
     private Role role;
 
     @Column(name = "doc_identidade_frente_url")
