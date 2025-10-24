@@ -1,11 +1,15 @@
 package br.gov.formosa.sigo2.repository;
 
+import br.gov.formosa.sigo2.model.ChecklistTemplate;
 import br.gov.formosa.sigo2.model.ChecklistTemplateItem;
+import br.gov.formosa.sigo2.model.enums.InspectionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ChecklistTemplateRepository extends JpaRepository<ChecklistTemplateItem, UUID> {
+public interface ChecklistTemplateRepository extends JpaRepository<ChecklistTemplate, UUID> {
+    Optional<ChecklistTemplate> findByTypeAndActiveTrue(InspectionType type);
 }
