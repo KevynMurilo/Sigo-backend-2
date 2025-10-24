@@ -12,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface ChecklistTemplateRepository extends JpaRepository<ChecklistTemplate, UUID> {
     Optional<ChecklistTemplate> findByTypeAndActiveTrue(InspectionType type);
+    Optional<ChecklistTemplate> findByName(String name);
 }
