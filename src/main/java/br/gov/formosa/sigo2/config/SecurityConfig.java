@@ -31,7 +31,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Constantes para nomes de papéis (boa prática)
     private static final String SOLICITANTE = "SOLICITANTE";
     private static final String CIDADAO_DENUNCIANTE = "CIDADAO_DENUNCIANTE";
     private static final String SECRETARIO = "SECRETARIO";
