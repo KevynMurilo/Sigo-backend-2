@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class ReportController {
     private final ListMyPendingReportsUseCase listMyPendingReportsUseCase;
     private final ResolveReportUseCase resolveReportUseCase;
     private final GetReportDetailsUseCase getReportDetailsUseCase;
+    private final ListMySubmittedReportsUseCase listMySubmittedReportsUseCase;
 
     @PostMapping
     public ResponseEntity<ReportDTOs.ReportDetailsDTO> createReport(
@@ -88,5 +90,18 @@ public class ReportController {
 
         ReportDTOs.ReportDetailsDTO report = getReportDetailsUseCase.execute(id, currentUser);
         return ResponseEntity.ok(report);
+    }
+
+    @GetMapping("/my-submitted")
+    public ResponseEntity<Page<ReportDTOs.ReportSummaryDTO>> listMySubmittedReports(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault Pageable pageable) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Page<ReportDTOs.ReportSummaryDTO> page = listMySubmittedReportsUseCase.execute(currentUser, pageable);
+        return ResponseEntity.ok(page);
     }
 }

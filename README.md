@@ -173,41 +173,48 @@ Para fins de teste, recomenda-se utilizar URLs simuladas e o endpoint de login c
     * 👤 **Papel:** Público ou **CIDADAO_DENUNCIANTE**
     * 🔑 **Autenticação:** Opcional
     * **Rota:** `POST /api/reports`
-    * **Ação:** Submete uma denúncia sobre irregularidade.
+    * [cite_start]**Ação:** Submete uma denúncia sobre irregularidade [cite: 176-183].
     * **Input:** `CreateReportDTO`.
     * **Verificar:** `Report` criado com status `RECEBIDA`.
 
-2.  **Listar Denúncias para Triagem:**
+2.  **Listar Minhas Denúncias Submetidas):**
+    * 👤 **Papel:** Qualquer usuário logado (**CIDADAO_DENUNCIANTE**, **SOLICITANTE**, etc.)
+    * 🔑 **Autenticação:** **Sim**
+    * **Rota:** `GET /api/reports/my-submitted`
+    * **Ação:** Busca a lista paginada de denúncias que o usuário logado submeteu *de forma identificada*. Denúncias anônimas não são listadas.
+    * **Verificar:** Retorna `Page<ReportSummaryDTO>` contendo as denúncias corretas.
+
+3.  **Listar Denúncias para Triagem:**
     * 👤 **Papel:** **SECRETARIO**
     * 🔑 **Autenticação:** **Sim**
     * **Rota:** `GET /api/reports/triage`
-    * **Ação:** Busca a fila de denúncias aguardando análise.
-    * **Verificar:** A denúncia criada deve aparecer na lista (`Page<ReportSummaryDTO>`). Obtenha o `ID`.
+    * [cite_start]**Ação:** Busca a fila de denúncias aguardando análise [cite: 185-186].
+    * **Verificar:** A denúncia criada no item 1 deve aparecer na lista (`Page<ReportSummaryDTO>`). Obtenha o `ID`.
 
-3.  **Atribuir Denúncia:**
+4.  **Atribuir Denúncia:**
     * 👤 **Papel:** **SECRETARIO**
     * 🔑 **Autenticação:** **Sim**
     * **Rota:** `POST /api/reports/{id_da_denuncia}/assign`
-    * **Ação:** Encaminha a denúncia para um agente de campo.
+    * [cite_start]**Ação:** Encaminha a denúncia para um agente de campo[cite: 187].
     * **Input:** `AssignReportDTO` (`assignToUserId`).
     * **Verificar:** Status do `Report` muda para `ENCAMINHADA`.
 
-4.  **Listar Denúncias Pendentes (Agente):**
+5.  **Listar Denúncias Pendentes (Agente):**
     * 👤 **Papel:** **FISCAL** ou **VIGILANTE SANITARIO**
     * 🔑 **Autenticação:** **Sim**
     * **Rota:** `GET /api/reports/my-pending`
-    * **Ação:** O agente busca sua fila de denúncias a verificar.
+    * [cite_start]**Ação:** O agente busca sua fila de denúncias a verificar[cite: 188].
     * **Verificar:** A denúncia atribuída deve aparecer. Obtenha o `ID`.
 
-5.  **Resolver Denúncia:**
+6.  **Resolver Denúncia:**
     * 👤 **Papel:** **FISCAL** ou **VIGILANTE SANITARIO** (atribuído)
     * 🔑 **Autenticação:** **Sim**
     * **Rota:** `POST /api/reports/{id_da_denuncia}/resolve`
-    * **Ação:** Registra o resultado da verificação da denúncia.
+    * [cite_start]**Ação:** Registra o resultado da verificação da denúncia[cite: 189].
     * **Input:** `ResolveReportDTO`.
     * **Verificar:** Status do `Report` muda para `RESOLVIDA`.
 
-6.  **Ver Detalhes da Denúncia:**
+7.  **Ver Detalhes da Denúncia:**
     * 👤 **Papel:** **SECRETARIO**, **ADMIN_MASTER**, Agente Atribuído, Reportador (se não anônimo).
     * 🔑 **Autenticação:** **Sim**
     * **Rota:** `GET /api/reports/{id_da_denuncia}`
