@@ -2,24 +2,25 @@ package br.gov.formosa.sigo2.service.user;
 
 import br.gov.formosa.sigo2.dto.UserDTOs;
 import br.gov.formosa.sigo2.mapper.UserMapper;
-import br.gov.formosa.sigo2.model.User;
 import br.gov.formosa.sigo2.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
-public class ListAllUserUseCase {
+public class FindUserByIdUseCase {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public Page<UserDTOs.UserResponseDTO> execute(Pageable pageable) {
-        Page<User> userPage = userRepository.findAll(pageable);
-        return userMapper.toUserResponseDTOPage(userPage);
+    public UserDTOs.UserResponseDTO execute(UUID userId) {
+        return userRepository.findById(userId)
+                .map(userMapper::toUserResponseDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userId));
     }
 }
