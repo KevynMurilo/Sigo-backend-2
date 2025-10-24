@@ -4,10 +4,12 @@ import br.gov.formosa.sigo2.dto.InspectionDTOs;
 import br.gov.formosa.sigo2.mapper.InspectionMapper;
 import br.gov.formosa.sigo2.model.*;
 import br.gov.formosa.sigo2.model.enums.InspectionStatus;
+import br.gov.formosa.sigo2.model.enums.InspectionType;
 import br.gov.formosa.sigo2.model.enums.RequestStatus;
 import br.gov.formosa.sigo2.repository.ChecklistTemplateItemRepository;
 import br.gov.formosa.sigo2.repository.InspectionRepository;
 import br.gov.formosa.sigo2.repository.RequestRepository;
+import br.gov.formosa.sigo2.service.util.ConfigurationService;
 import br.gov.formosa.sigo2.service.util.StatusHistoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
@@ -16,7 +18,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +38,7 @@ public class SubmitInspectionApprovalUseCase {
     private final RequestRepository requestRepository;
     private final InspectionMapper inspectionMapper;
     private final StatusHistoryService statusHistoryService;
+    private final ConfigurationService configurationService;
 
     @Transactional
     public InspectionDTOs.FullInspectionResponseDTO execute(UUID inspectionId, InspectionDTOs.SubmitInspectionDTO dto, User inspector) {
@@ -48,12 +55,20 @@ public class SubmitInspectionApprovalUseCase {
 
         inspection.setStatus(InspectionStatus.APROVADA);
         inspection.setInspectionDate(LocalDateTime.now());
-        inspection.setCalculatedFee(dto.calculatedFee());
         inspection.setObservations(dto.observations());
+
+        if (inspection.getType() == InspectionType.FISCAL) {
+            BigDecimal proportionalFee = calculateProportionalFee();
+            inspection.setCalculatedFee(proportionalFee);
+        } else if (inspection.getType() == InspectionType.SANITARIA) {
+            if (dto.calculatedFee() == null) {
+                throw new ValidationException("A taxa de vistoria sanitária é obrigatória.");
+            }
+            inspection.setCalculatedFee(dto.calculatedFee());
+        }
 
         Inspection savedInspection = inspectionRepository.save(inspection);
 
-        // Passa o ID da request para o método de verificação
         checkRequestStatus(savedInspection.getRequest().getId(), inspector);
 
         return inspectionMapper.toFullInspectionResponseDTO(savedInspection);
@@ -119,5 +134,23 @@ public class SubmitInspectionApprovalUseCase {
             requestRepository.save(freshRequest);
             statusHistoryService.logStatusChange(freshRequest, oldStatus, RequestStatus.AGUARDANDO_EMISSAO_BOLETO, inspector);
         }
+    }
+
+    private BigDecimal calculateProportionalFee() {
+        BigDecimal annualFee = configurationService.getDecimal("TAXA_OCUPACAO_ANUAL_BASE");
+        if (annualFee == null || annualFee.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new EntityNotFoundException("Configuração 'TAXA_OCUPACAO_ANUAL_BASE' não definida ou inválida.");
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate endOfYear = today.withDayOfYear(today.lengthOfYear());
+
+        long daysRemaining = ChronoUnit.DAYS.between(today, endOfYear) + 1;
+        long totalDaysInYear = today.lengthOfYear();
+
+        BigDecimal dailyRate = annualFee.divide(new BigDecimal(totalDaysInYear), 10, RoundingMode.HALF_UP);
+        BigDecimal proportionalFee = dailyRate.multiply(new BigDecimal(daysRemaining));
+
+        return proportionalFee.setScale(2, RoundingMode.HALF_UP);
     }
 }

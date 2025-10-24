@@ -63,7 +63,6 @@ public class InspectionDTOs {
 
             String observations,
 
-            @NotNull
             @DecimalMin("0.0")
             BigDecimal calculatedFee
     ) {}
