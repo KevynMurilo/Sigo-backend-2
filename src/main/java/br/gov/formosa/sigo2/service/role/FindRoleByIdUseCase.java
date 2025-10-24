@@ -4,28 +4,24 @@ import br.gov.formosa.sigo2.dto.RoleDTOs;
 import br.gov.formosa.sigo2.mapper.RoleMapper;
 import br.gov.formosa.sigo2.model.Role;
 import br.gov.formosa.sigo2.repository.RoleRepository;
-import jakarta.validation.ValidationException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
-public class CreateRoleUseCase {
+public class FindRoleByIdUseCase {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
 
-    @Transactional
-    public RoleDTOs.RoleResponseDTO execute(RoleDTOs.CreateRoleDTO dto) {
-        roleRepository.findByNameIgnoreCase(dto.name()).ifPresent(r -> {
-            throw new ValidationException("Papel com este nome já existe.");
-        });
-
-        Role role = roleMapper.fromCreateDTO(dto);
-
-        Role savedRole = roleRepository.save(role);
-
-        return roleMapper.toRoleResponseDTO(savedRole);
+    @Transactional(readOnly = true)
+    public RoleDTOs.RoleResponseDTO execute(UUID id) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Papel não encontrado: " + id));
+        return roleMapper.toRoleResponseDTO(role);
     }
 }

@@ -8,7 +8,6 @@ import br.gov.formosa.sigo2.model.Payment;
 import br.gov.formosa.sigo2.model.Request;
 import br.gov.formosa.sigo2.model.enums.PaymentStatus;
 import br.gov.formosa.sigo2.model.enums.RequestStatus;
-import br.gov.formosa.sigo2.repository.PaymentRepository;
 import br.gov.formosa.sigo2.repository.RequestRepository;
 import br.gov.formosa.sigo2.service.util.ConfigurationService;
 import br.gov.formosa.sigo2.service.util.ProtocolGeneratorService;
