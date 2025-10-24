@@ -31,6 +31,12 @@ public abstract class PaymentMapper {
     @Mapping(target = "paymentItemsJson", expression = "java(itemsToJson(inspections))")
     public abstract Payment paymentFromInspections(List<Inspection> inspections, BigDecimal totalAmount, LocalDate dueDate, String billUrl);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "request", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "paymentItemsJson", expression = "java(feeItemsToJson(feeItems))")
+    public abstract Payment paymentFromFeeItems(List<PaymentDTOs.FeeItemDTO> feeItems, BigDecimal totalAmount, LocalDate dueDate, String billUrl);
+
     protected String itemsToJson(List<Inspection> inspections) {
         if (inspections == null || inspections.isEmpty()) {
             return "[]";
@@ -40,6 +46,11 @@ public abstract class PaymentMapper {
                         insp.getType().name(),
                         insp.getCalculatedFee()))
                 .collect(Collectors.toList());
+
+        return feeItemsToJson(items);
+    }
+
+    protected String feeItemsToJson(List<PaymentDTOs.FeeItemDTO> items) {
         try {
             return objectMapper.writeValueAsString(items);
         } catch (JsonProcessingException e) {

@@ -43,4 +43,16 @@ public interface RequestMapper {
     @Mapping(target = "statusHistory", ignore = true)
     @Mapping(target = "ownerDocument", source = "ownerDocument")
     Request createNewRequestDtoToRequest(RequestDTOs.CreateNewRequestDTO dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "protocol", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "expiresAt", ignore = true)
+    @Mapping(target = "parentRequest", ignore = true)
+    @Mapping(target = "inspections", ignore = true)
+    @Mapping(target = "payments", ignore = true)
+    @Mapping(target = "statusHistory", ignore = true)
+    @Mapping(target = "location", ignore = true)
+    Request createRenewalFromParent(Request parent);
 }

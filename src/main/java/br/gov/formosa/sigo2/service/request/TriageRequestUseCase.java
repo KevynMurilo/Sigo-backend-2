@@ -18,6 +18,7 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +50,8 @@ public class TriageRequestUseCase {
         newInspections.add(createInspection(request, fiscal, InspectionType.FISCAL));
 
         RequestStatus newStatus;
-        boolean requiresSanitary = isSanitaryRequired(request.getCommerceType());
+
+        boolean requiresSanitary = configurationService.isSanitaryRequired(request.getCommerceType());
 
         if (requiresSanitary) {
             if (dto.sanitaryUserId() == null) {
@@ -73,11 +75,6 @@ public class TriageRequestUseCase {
         statusHistoryService.logStatusChange(savedRequest, RequestStatus.NOVA, newStatus, secretario);
 
         return requestMapper.toRequestDetailsDTO(savedRequest);
-    }
-
-    private boolean isSanitaryRequired(String commerceType) {
-        return configurationService.getSanitaryInspectionCommerceTypes()
-                .stream().anyMatch(type -> commerceType.equalsIgnoreCase(type));
     }
 
     private Inspection createInspection(Request request, User inspector, InspectionType type) {
