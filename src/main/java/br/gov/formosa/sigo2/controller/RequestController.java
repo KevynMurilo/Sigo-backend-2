@@ -28,6 +28,7 @@ public class RequestController {
     private final ListAllRequestsUseCase listAllRequestsUseCase;
     private final TriageRequestUseCase triageRequestUseCase;
     private final HandleRenewalUseCase handleRenewalUseCase;
+    private final SubmitCorrectionResponseUseCase submitCorrectionResponseUseCase;
 
     @PostMapping
     public ResponseEntity<RequestDTOs.RequestDetailsDTO> createNewRequest(
@@ -43,6 +44,16 @@ public class RequestController {
                 .toUri();
 
         return ResponseEntity.created(location).body(createdRequest);
+    }
+
+    @PostMapping("/{id}/submit-correction")
+    public ResponseEntity<RequestDTOs.RequestDetailsDTO> submitCorrectionResponse(
+            @PathVariable UUID id,
+            @Valid @RequestBody RequestDTOs.SubmitCorrectionResponseDTO dto,
+            @AuthenticationPrincipal User applicant) {
+
+        RequestDTOs.RequestDetailsDTO updatedRequest = submitCorrectionResponseUseCase.execute(id, dto, applicant);
+        return ResponseEntity.ok(updatedRequest);
     }
 
     @GetMapping("/my")

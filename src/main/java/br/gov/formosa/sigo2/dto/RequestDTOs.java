@@ -56,6 +56,17 @@ public class RequestDTOs {
             String cnpjDocumentUrl
     ) {}
 
+    public record SubmitCorrectionResponseDTO(
+            @NotBlank
+            String confirmationNotes,
+
+            String newPhotoFrontUrl,
+            String newPhotoLeftUrl,
+            String newPhotoRightUrl,
+            String newPhotoBackUrl,
+            String newCnpjDocumentUrl
+    ) {}
+
     public record TriageRequestDTO(
             @NotNull
             UUID fiscalUserId,

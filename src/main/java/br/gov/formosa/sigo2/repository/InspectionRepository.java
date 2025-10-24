@@ -1,8 +1,10 @@
 package br.gov.formosa.sigo2.repository;
 
 import br.gov.formosa.sigo2.model.Inspection;
+import br.gov.formosa.sigo2.model.Request;
 import br.gov.formosa.sigo2.model.User;
 import br.gov.formosa.sigo2.model.enums.InspectionStatus;
+import br.gov.formosa.sigo2.model.enums.InspectionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +19,6 @@ public interface InspectionRepository extends JpaRepository<Inspection, UUID> {
     Page<Inspection> findByInspectorAndStatus(User inspector, InspectionStatus status, Pageable pageable);
 
     Optional<Inspection> findByIdAndInspector(UUID id, User inspector);
+
+    Optional<Inspection> findByRequestAndTypeAndStatus(Request request, InspectionType type, InspectionStatus status);
 }
